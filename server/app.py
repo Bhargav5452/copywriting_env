@@ -11,17 +11,22 @@ os.environ["ENABLE_WEB_INTERFACE"] = "true"
 from openenv.core.env_server.http_server import create_app
 from openenv.core.env_server.types import Observation
 
+# Add the current directory to sys.path so sibling modules (models, environment) can be found
+current_dir = Path(__file__).parent
+if str(current_dir) not in sys.path:
+    sys.path.append(str(current_dir))
+
 try:
-    from src.envs.copywriting_env.models import CallToolAction, CopywritingObservation
-    from src.envs.copywriting_env.server.environment import CopywritingEnvironment
+    from models import CallToolAction, CopywritingObservation
+    from environment import CopywritingEnvironment
 except ImportError:
+    # Fallback for different execution contexts
     try:
-        from models import CallToolAction, CopywritingObservation
-        from server.environment import CopywritingEnvironment
-    except ImportError:
-        sys.path.append(str(Path(__file__).parent.parent))
-        from models import CallToolAction, CopywritingObservation
-        from environment import CopywritingEnvironment
+        from .models import CallToolAction, CopywritingObservation
+        from .environment import CopywritingEnvironment
+    except (ImportError, ValueError):
+        from src.envs.copywriting_env.models import CallToolAction, CopywritingObservation
+        from src.envs.copywriting_env.server.environment import CopywritingEnvironment
 
 
 class ParseArgumentsMiddleware(BaseHTTPMiddleware):

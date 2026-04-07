@@ -8,12 +8,24 @@ from fastmcp import FastMCP
 from openenv.core.env_server.mcp_environment import MCPEnvironment
 from openenv.core.env_server.types import Action, Observation, State
 
+import sys
+from pathlib import Path
+
+# Add current directory to path for local imports
+current_dir = Path(__file__).parent
+if str(current_dir) not in sys.path:
+    sys.path.append(str(current_dir))
+
 try:
-    from .graders import grade_ab_judge, grade_cold_email, grade_subject_line
-    from .tasks import TASKS
-except ImportError:
     from graders import grade_ab_judge, grade_cold_email, grade_subject_line
     from tasks import TASKS
+except ImportError:
+    try:
+        from .graders import grade_ab_judge, grade_cold_email, grade_subject_line
+        from .tasks import TASKS
+    except (ImportError, ValueError):
+        from src.envs.copywriting_env.server.graders import grade_ab_judge, grade_cold_email, grade_subject_line
+        from src.envs.copywriting_env.server.tasks import TASKS
 
 
 _REQUIRED_TOOLS = {"subject_line_rewrite", "cold_email_draft", "ab_copy_judge"}
