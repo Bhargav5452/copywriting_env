@@ -6,14 +6,14 @@ vaderSentiment
 textstat
 fastmcp
 openai
-gradio<5.0.0
+gradio
 python-multipart
 google-generativeai
 python-dotenv
 typer
 rich
 pyyaml
-huggingface_hub<0.25.0
+huggingface_hub
 tomli
 tomli-w
 websockets
