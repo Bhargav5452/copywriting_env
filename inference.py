@@ -16,11 +16,16 @@ except ImportError:
     from src.envs.copywriting_env.client import CopywritingEnv
     from src.envs.copywriting_env.models import CallToolAction
 
-# MANDATORY ENVIRONMENT VARIABLES
-# Defaults match your active inference setup
-API_BASE_URL = os.getenv("API_BASE_URL") or "https://router.huggingface.co/v1"
-MODEL_NAME = os.getenv("MODEL_NAME") or "Qwen/Qwen2.5-72B-Instruct"
-API_KEY = os.getenv("HF_TOKEN") or os.getenv("OPENAI_API_KEY")
+# MANDATORY ENVIRONMENT VARIABLES (Matched to Checklist)
+API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
+MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
+HF_TOKEN = os.getenv("HF_TOKEN")
+
+# Optional - for local docker usage
+LOCAL_IMAGE_NAME = os.getenv("LOCAL_IMAGE_NAME")
+
+# Internal alias for code compatibility
+API_KEY = HF_TOKEN or os.getenv("OPENAI_API_KEY")
 
 # ENVIRONMENT CONFIG
 ENV_URL = os.getenv("ENV_URL", "http://localhost:7860")
