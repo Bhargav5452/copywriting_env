@@ -567,7 +567,6 @@ def create_web_interface_app(
         app,
         gradio_blocks,
         path="/web",
-        css=OPENENV_GRADIO_CSS,
     )
 
     return app
