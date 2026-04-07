@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "copywriting-env"
+version = "0.1.0"
+description = "AI Copywriting Assessment and Grading Environment"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.104.0",
+    "pydantic>=2.0.0",
+    "uvicorn>=0.24.0",
+    "gradio>=5.0.0",
+    "openai>=2.0.0",
+    "vaderSentiment>=3.3.2",
+    "textstat>=0.7.3",
+    "python-dotenv>=1.0.0",
+    "openenv-core>=0.2.0",
+]
+
+[project.scripts]
+server = "server.app:main"
+
+[tool.setuptools]
+package-dir = {"" = "."}
+packages = ["server", "openenv"]

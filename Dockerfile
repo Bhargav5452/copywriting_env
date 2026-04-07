@@ -23,6 +23,5 @@ ENV PORT=7860
 # Expose the Hugging Face Space port
 EXPOSE 7860
 
-# Start the application using Uvicorn
-# We run 'app:app' because app.py is in the root of the deployment
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
+# Start the application using Uvicorn from the new server/ directory
+CMD ["uvicorn", "server.app:app", "--host", "0.0.0.0", "--port", "7860"]
