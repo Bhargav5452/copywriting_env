@@ -6,7 +6,7 @@ vaderSentiment
 textstat
 fastmcp
 openai
-gradio
+gradio<5.0.0
 python-multipart
 google-generativeai
 openenv-core
