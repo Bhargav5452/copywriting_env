@@ -45,25 +45,28 @@ class CopywritingEnvironment(MCPEnvironment):
             self._completed_tools.add("subject_line_rewrite")
             self._task1_output = candidate
             task = TASKS["subject_line_rewrite"]
+            grader_fn = task["grader"]
             return {"task_id": task["id"], "difficulty": task["difficulty"],
-                    "prompt": task["prompt"], **grade_subject_line(candidate, task["ground_truth"])}
+                    "prompt": task["prompt"], **grader_fn(candidate, task["ground_truth"])}
 
         @mcp.tool
         def cold_email_draft(candidate: str) -> dict:
             """Draft a cold email for a CFO. Graded on word count, CTA, readability."""
             self._completed_tools.add("cold_email_draft")
             task = TASKS["cold_email_draft"]
+            grader_fn = task["grader"]
             prompt = task["prompt"].format(headline=self._task1_output or "No headline provided")
             return {"task_id": task["id"], "difficulty": task["difficulty"],
-                    "prompt": prompt, **grade_cold_email(candidate, task["ground_truth"])}
+                    "prompt": prompt, **grader_fn(candidate, task["ground_truth"])}
 
         @mcp.tool
         def ab_copy_judge(candidate: str) -> dict:
             """Pick the winning A/B campaign variant with 3 reasons. Ground truth = B."""
             self._completed_tools.add("ab_copy_judge")
             task = TASKS["ab_copy_judge"]
+            grader_fn = task["grader"]
             return {"task_id": task["id"], "difficulty": task["difficulty"],
-                    "prompt": task["prompt"], **grade_ab_judge(candidate, task["ground_truth"])}
+                    "prompt": task["prompt"], **grader_fn(candidate, task["ground_truth"])}
 
         super().__init__(mcp)
         self._state = State(episode_id=str(uuid4()), step_count=0)

@@ -9,6 +9,12 @@ Each task is a dict with:
   - ground_truth: reference data used by graders
 """
 
+try:
+    from graders import grade_ab_judge, grade_cold_email, grade_subject_line
+except ImportError:
+    from .graders import grade_ab_judge, grade_cold_email, grade_subject_line
+
+
 TASKS = {
     # ─────────────────────────────────────────────────────────────
     # TASK 1 — Easy: Subject Line Rewrite
@@ -16,6 +22,7 @@ TASKS = {
     "subject_line_rewrite": {
         "id": "subject_line_rewrite",
         "difficulty": "easy",
+        "grader": grade_subject_line,
         "prompt": (
             "Rewrite the following weak email subject line to maximise open rates.\n\n"
             "ORIGINAL: 'Monthly newsletter - please read'\n\n"
@@ -46,6 +53,7 @@ TASKS = {
     "cold_email_draft": {
         "id": "cold_email_draft",
         "difficulty": "medium",
+        "grader": grade_cold_email,
         "prompt": (
             "You previously wrote this ad headline for a campaign:\n"
             "{headline}\n\n"
@@ -80,6 +88,7 @@ TASKS = {
     "ab_copy_judge": {
         "id": "ab_copy_judge",
         "difficulty": "hard",
+        "grader": grade_ab_judge,
         "prompt": (
             "You have two complete B2B marketing campaigns:\n\n"
             "CAMPAIGN A:\n"
