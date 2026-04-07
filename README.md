@@ -1,3 +1,14 @@
+---
+title: Copywriting AI Grading Environment
+emoji: ✍️
+colorFrom: blue
+colorTo: indigo
+sdk: gradio
+sdk_version: 5.20.1
+app_file: app.py
+pinned: false
+---
+
 # Copywriting AI Grading Environment ✍️
 
 Welcome to the **Copywriting Assessment Environment**! This environment is designed to benchmark and grade AI marketing agents across three tasks of increasing difficulty:
