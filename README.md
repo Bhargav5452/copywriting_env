@@ -1,10 +1,15 @@
 ---
-Title: Copywriting AI Grading Environment \n sdk: docker\npinned: false
+title: Copywriting AI Grading Environment
+emoji: ✍️
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+pinned: false
 ---
 
 # Copywriting AI Grading Environment ✍️
 
-Welcome to the **Copywriting Assessment Environment**! This environment is designed to benchmark and grade AI marketing agents across three tasks of increasing difficulty:
+Welcome to the **Copywriting Assessment Environment**! This environment is designed to benchmark and grade AI marketing agents across three tasks:
 
 1.  **Task 1 (Easy)**: Rewriting raw subject lines for maximum open rates.
 2.  **Task 2 (Medium)**: Drafting a cold outreach email focused on ROI and CFO pain points.
