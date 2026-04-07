@@ -3,9 +3,7 @@ title: Copywriting AI Grading Environment
 emoji: ✍️
 colorFrom: blue
 colorTo: indigo
-sdk: gradio
-sdk_version: 5.20.1
-app_file: app.py
+sdk: docker
 pinned: false
 ---
 
