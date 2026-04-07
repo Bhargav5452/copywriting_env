@@ -9,12 +9,26 @@ from dotenv import load_dotenv
 # Load locally if .env exists
 load_dotenv()
 
+import sys
+from pathlib import Path
+
+# Add 'server' directory to path to handle the restructured environment
+current_dir = Path(__file__).parent
+server_dir = current_dir / "server"
+if str(server_dir) not in sys.path:
+    sys.path.append(str(server_dir))
+
 try:
     from client import CopywritingEnv
     from models import CallToolAction
 except ImportError:
-    from src.envs.copywriting_env.client import CopywritingEnv
-    from src.envs.copywriting_env.models import CallToolAction
+    try:
+        from server.client import CopywritingEnv
+        from server.models import CallToolAction
+    except ImportError:
+        # Fallback for original openenv structure
+        from src.envs.copywriting_env.client import CopywritingEnv
+        from src.envs.copywriting_env.models import CallToolAction
 
 # MANDATORY ENVIRONMENT VARIABLES (Matched to Checklist)
 API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
