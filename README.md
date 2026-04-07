@@ -1,10 +1,5 @@
 ---
-title: Copywriting AI Grading Environment
-emoji: ✍️
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-pinned: false
+Title: Copywriting AI Grading Environment \n sdk: docker\npinned: false
 ---
 
 # Copywriting AI Grading Environment ✍️
