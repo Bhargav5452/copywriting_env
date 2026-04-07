@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+starlette
+pydantic
+vaderSentiment
+textstat
+fastmcp
+openai
+gradio
+python-multipart
+google-generativeai
+openenv-core
+python-dotenv
