@@ -9,5 +9,12 @@ openai
 gradio<5.0.0
 python-multipart
 google-generativeai
-openenv-core
 python-dotenv
+typer
+rich
+pyyaml
+huggingface_hub
+tomli
+tomli-w
+websockets
+httpx
