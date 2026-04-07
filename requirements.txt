@@ -13,7 +13,7 @@ python-dotenv
 typer
 rich
 pyyaml
-huggingface_hub
+huggingface_hub<0.25.0
 tomli
 tomli-w
 websockets
