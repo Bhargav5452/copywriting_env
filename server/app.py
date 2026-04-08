@@ -4,7 +4,7 @@ from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI
-from openenv.core.env_server.web_interface import create_app
+from openenv.core.env_server.http_server import create_app
 
 # Ensure environment module is discoverable
 sys.path.append(str(Path(__file__).parent))
