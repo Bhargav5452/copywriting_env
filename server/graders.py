@@ -9,7 +9,7 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 _vader = SentimentIntensityAnalyzer()
 
 
-def _clamp(v: float, lo: float = 0.0, hi: float = 1.0) -> float:
+def _clamp(v: float, lo: float = 0.01, hi: float = 0.99) -> float:
     return max(lo, min(hi, v))
 
 
