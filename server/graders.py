@@ -1,24 +1,30 @@
 from __future__ import annotations
+
 import re
 from typing import Any
+
 import textstat
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 _vader = SentimentIntensityAnalyzer()
 
+
 def _clamp(v: float, lo: float = 0.01, hi: float = 0.99) -> float:
     return max(lo, min(hi, v))
+
 
 def _vader_compound(text: str) -> float:
     return _vader.polarity_scores(text)["compound"]
 
+
 def _flesch_ease(text: str) -> float:
     return textstat.flesch_reading_ease(text)
 
+
 def grade_subject_line(text: str, gt: dict[str, Any]) -> dict[str, Any]:
     text = text.strip()
+
     char_count = len(text)
-    
     length_score = 0.40 if char_count <= gt["max_length"] else 0.0
 
     text_lower = text.lower()
@@ -32,6 +38,7 @@ def grade_subject_line(text: str, gt: dict[str, Any]) -> dict[str, Any]:
         sentiment_score = 0.30 * ((compound + 1.0) / 2.0)
 
     reward = _clamp(length_score + power_score + sentiment_score)
+
     feedback = [
         f"{'Good' if length_score else 'Too long'} length ({char_count}/{gt['max_length']} chars)",
         f"Power words: {hit_words or 'none'}",
@@ -51,8 +58,10 @@ def grade_subject_line(text: str, gt: dict[str, Any]) -> dict[str, Any]:
         },
     }
 
+
 def grade_cold_email(text: str, gt: dict[str, Any]) -> dict[str, Any]:
     text = text.strip()
+
     word_count = len(text.split())
     wc_min, wc_max = gt["word_count_min"], gt["word_count_max"]
 
@@ -76,6 +85,7 @@ def grade_cold_email(text: str, gt: dict[str, Any]) -> dict[str, Any]:
         fk_score = 0.0
 
     reward = _clamp(wc_score + cta_score + fk_score)
+
     feedback = [
         f"Words: {word_count} ({wc_min}-{wc_max}) -> {wc_score:.3f}",
         f"CTA: {matched_phrase or 'none found'}",
@@ -95,29 +105,35 @@ def grade_cold_email(text: str, gt: dict[str, Any]) -> dict[str, Any]:
         },
     }
 
+
 def grade_ab_judge(text: str, gt: dict[str, Any]) -> dict[str, Any]:
     text = text.strip()
 
-    # 1. Evaluate Choice (60%)
+    # 1. Evaluate Choice (60% Weight)
     match = re.search(r"(?:CHOICE|WINNER)\s*:\s*([AB])", text, re.IGNORECASE)
     chosen = match.group(1).upper() if match else None
     choice_correct = (chosen == gt["correct_choice"])
+    # Per user: 0.95 if correct else 0.05
     choice_base = 0.95 if choice_correct else 0.05
     choice_weighted = 0.6 * choice_base
 
-    # 2. Evaluate Reasoning Quality (40%)
+    # 2. Evaluate Reasoning Quality (40% Weight)
+    # Count unique reason patterns (e.g., REASON 1:)
     reason_hits = re.findall(gt["reason_pattern"], text, re.IGNORECASE)
     unique_reasons = len({r.upper() for r in reason_hits})
     reason_norm = _clamp(unique_reasons / gt["required_reasons"], 0.0, 1.0)
 
+    # Keywords evidence
     lowered = text.lower()
     kw_hits = [kw for kw in gt["evidence_keywords"] if kw in lowered]
     unique_kw = list(dict.fromkeys(kw_hits))[:3]
     kw_norm = len(unique_kw) / 3
 
+    # reasoning_quality (0.0 to 1.0)
     reasoning_quality = (0.6 * reason_norm) + (0.4 * kw_norm)
     reasoning_weighted = 0.4 * reasoning_quality
 
+    # Final Weighted score
     reward = _clamp(choice_weighted + reasoning_weighted)
 
     if not choice_correct:
