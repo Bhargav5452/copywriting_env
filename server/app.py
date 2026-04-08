@@ -16,7 +16,9 @@ except ImportError:
 
 app: FastAPI = create_app(lambda: CopywritingEnvironment())
 
-if __name__ == "__main__":
-    # Primary port for HF Spaces is 7860
+def main():
     port = int(os.getenv("PORT", 7860))
     uvicorn.run(app, host="0.0.0.0", port=port)
+
+if __name__ == "__main__":
+    main()
