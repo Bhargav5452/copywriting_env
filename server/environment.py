@@ -61,10 +61,19 @@ class CopywritingEnvironment(MCPEnvironment):
         self._state = State(episode_id=episode_id or str(uuid4()), step_count=0)
         self._task1_output = ""
         self._completed_tools = set()
+        
+        # Restore the initial prompt to the observation text for UI discovery
+        first_task = TASKS["subject_line_rewrite"]
+        initial_text = f"Welcome to the Copywriting Environment.\n\nTASK 1: {first_task['prompt']}"
+        
         return Observation(
+            text=initial_text,
             done=False,
             reward=0.0,
-            metadata={"status": "ready", "message": "Environment reset. Tools: rewrite | draft | judge"},
+            metadata={
+                "status": "ready",
+                "message": "Available tools: subject_line_rewrite | cold_email_draft | ab_copy_judge"
+            },
         )
 
     def _step_impl(self, action: Action, timeout_s: Optional[float] = None, **kwargs: Any) -> Observation:
@@ -83,6 +92,9 @@ class CopywritingEnvironment(MCPEnvironment):
                     obs.reward = float(data["reward"])
                 if "done" in data:
                     obs.done = bool(data["done"])
+                # Ensure the next task prompt is visible in the top-level text field
+                if "prompt" in data:
+                    obs.text = data["prompt"]
         
         self._state.step_count += 1
         if self._completed_tools >= _REQUIRED_TOOLS:
