@@ -111,49 +111,60 @@ async def main() -> None:
     # Initialize environment (Remote Space)
     env = CopywritingEnv(base_url=ENV_URL)
 
-    rewards: List[float] = []
-    steps_taken = 0
-    score = 0.0
-    success = False
+    tasks_to_eval = ["subject_line_rewrite", "cold_email_draft", "ab_copy_judge"]
+    
+    # Store dynamic prompts/outputs for sequential dependency (e.g. Task 2 needs Task 1's headline)
+    context_data = {"task1_output": "Monthly newsletter - please read"}
 
-    log_start(task=TASK_NAME, env=BENCHMARK, model=MODEL_NAME)
+    for task_name in tasks_to_eval:
+        rewards: List[float] = []
+        steps_taken = 0
+        score = 0.0
+        success = False
 
-    try:
-        await env.reset()
-        
-        tools = ["subject_line_rewrite", "cold_email_draft", "ab_copy_judge"]
-        
-        for step, tool_name in enumerate(tools, start=1):
-            prompt = f"Perform the {tool_name} task."
-            # In a real scenario, you might get specific prompts from the observation
+        # Use the specific task_name for logging to ensure platform discovery
+        log_start(task=task_name, env=BENCHMARK, model=MODEL_NAME)
+
+        try:
+            await env.reset()
             
-            message = get_model_message(client, tool_name, prompt)
+            # Prepare the specific prompt for this task
+            if task_name == "subject_line_rewrite":
+                prompt = context_data["task1_output"]
+            elif task_name == "cold_email_draft":
+                prompt = f"Headline: {context_data.get('task1_output', 'Marketing Update')}"
+            else:
+                prompt = "Perform the A/B copy judge task."
+            
+            message = get_model_message(client, task_name, prompt)
 
-            action = CallToolAction(tool_name=tool_name, arguments={"candidate": message})
+            action = CallToolAction(tool_name=task_name, arguments={"candidate": message})
             result = await env.step(action)
 
             reward = float(result.reward or 0.0)
             done = bool(result.done)
 
+            # Update context for next task if needed
+            if task_name == "subject_line_rewrite" and message:
+                context_data["task1_output"] = message
+
             rewards.append(reward)
-            steps_taken = step
-            log_step(step=step, action=message, reward=reward, done=done, error=None)
+            steps_taken = 1
+            log_step(step=1, action=message, reward=reward, done=done, error=None)
 
-            if done:
-                break
+            score = reward # Single tool call per episodic task here
+            success = score >= SUCCESS_SCORE_THRESHOLD
 
-        score = sum(rewards) / MAX_STEPS if MAX_STEPS > 0 else 0.0
-        score = min(max(score, 0.0), 1.0)
-        success = score >= SUCCESS_SCORE_THRESHOLD
+        except Exception as exc:
+            print(f"[DEBUG] Episode error for {task_name}: {exc}", flush=True)
+        finally:
+            log_end(success=success, steps=steps_taken, score=score, rewards=rewards)
 
-    except Exception as exc:
-        print(f"[DEBUG] Episode error: {exc}", flush=True)
-    finally:
-        try:
-            await env.close()
-        except Exception as e:
-            print(f"[DEBUG] env.close() error: {e}", flush=True)
-        log_end(success=success, steps=steps_taken, score=score, rewards=rewards)
+    try:
+        await env.close()
+    except Exception as e:
+        print(f"[DEBUG] env.close() error: {e}", flush=True)
+
 
 if __name__ == "__main__":
     asyncio.run(main())

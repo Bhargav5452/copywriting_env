@@ -1,6 +1,14 @@
-spec_version: 1
 name: copywriting_env
 type: space
 runtime: fastapi
 app: server.app:app
 port: 7860
+
+benchmarks:
+  - id: subject_line_rewrite
+    description: "Rewrite a marketing subject line to optimize metrics."
+  - id: cold_email_draft
+    description: "Draft a high-conversion cold outreach email."
+  - id: ab_copy_judge
+    description: "Analyze and judge the effectiveness of A/B campaign variants."
+
