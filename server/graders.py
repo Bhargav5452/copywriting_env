@@ -109,42 +109,52 @@ def grade_cold_email(text: str, gt: dict[str, Any]) -> dict[str, Any]:
 def grade_ab_judge(text: str, gt: dict[str, Any]) -> dict[str, Any]:
     text = text.strip()
 
+    # 1. Evaluate Choice (60% Weight)
     match = re.search(r"(?:CHOICE|WINNER)\s*:\s*([AB])", text, re.IGNORECASE)
     chosen = match.group(1).upper() if match else None
-    choice_score = 0.50 if chosen == gt["correct_choice"] else 0.0
+    choice_correct = (chosen == gt["correct_choice"])
+    # Per user: 0.95 if correct else 0.05
+    choice_base = 0.95 if choice_correct else 0.05
+    choice_weighted = 0.6 * choice_base
 
+    # 2. Evaluate Reasoning Quality (40% Weight)
+    # Count unique reason patterns (e.g., REASON 1:)
     reason_hits = re.findall(gt["reason_pattern"], text, re.IGNORECASE)
     unique_reasons = len({r.upper() for r in reason_hits})
-    reason_score = 0.30 * _clamp(unique_reasons / gt["required_reasons"])
+    reason_norm = _clamp(unique_reasons / gt["required_reasons"], 0.0, 1.0)
 
+    # Keywords evidence
     lowered = text.lower()
     kw_hits = [kw for kw in gt["evidence_keywords"] if kw in lowered]
     unique_kw = list(dict.fromkeys(kw_hits))[:3]
-    kw_score = 0.20 * (len(unique_kw) / 3)
+    kw_norm = len(unique_kw) / 3
 
-    reward = _clamp(choice_score + reason_score + kw_score)
+    # reasoning_quality (0.0 to 1.0)
+    reasoning_quality = (0.6 * reason_norm) + (0.4 * kw_norm)
+    reasoning_weighted = 0.4 * reasoning_quality
 
-    if choice_score == 0.0:
+    # Final Weighted score
+    reward = _clamp(choice_weighted + reasoning_weighted)
+
+    if not choice_correct:
         choice_feedback = f"Wrong choice: {chosen}" if chosen else "No WINNER/CHOICE line"
     else:
         choice_feedback = f"Correct choice: {chosen}"
 
     feedback = [
         choice_feedback,
-        f"Reasons: {unique_reasons}/{gt['required_reasons']} -> {reason_score:.3f}",
-        f"Keywords: {unique_kw} -> {kw_score:.3f}",
+        f"Reasoning Quality: {reasoning_quality:.2f} ({unique_reasons} reasons, {len(unique_kw)} keywords)",
     ]
 
     return {
         "reward": round(reward, 4),
         "feedback": " | ".join(feedback),
         "breakdown": {
-            "choice_score": round(choice_score, 4),
-            "reason_score": round(reason_score, 4),
-            "kw_score": round(kw_score, 4),
-            "chosen": chosen,
-            "correct": gt["correct_choice"],
+            "choice_weighted": round(choice_weighted, 4),
+            "reasoning_weighted": round(reasoning_weighted, 4),
+            "choice_correct": choice_correct,
             "reasons_found": unique_reasons,
             "keywords_hit": unique_kw,
+            "reasoning_quality": round(reasoning_quality, 4),
         },
     }
