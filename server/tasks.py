@@ -1,12 +1,5 @@
 """
 Task definitions and ground-truth data for copywriting_env.
-
-Each task is a dict with:
-  - id          : unique task identifier
-  - difficulty  : "easy" | "medium" | "hard"
-  - prompt      : what is shown to the agent
-  - context     : extra info the agent may reference (optional)
-  - ground_truth: reference data used by graders
 """
 
 try:
@@ -16,9 +9,6 @@ except ImportError:
 
 
 TASKS = {
-    # ─────────────────────────────────────────────────────────────
-    # TASK 1 — Easy: Subject Line Rewrite
-    # ─────────────────────────────────────────────────────────────
     "subject_line_rewrite": {
         "id": "subject_line_rewrite",
         "difficulty": "easy",
@@ -47,9 +37,6 @@ TASKS = {
         },
     },
 
-    # ─────────────────────────────────────────────────────────────
-    # TASK 2 — Medium: Cold Email Draft
-    # ─────────────────────────────────────────────────────────────
     "cold_email_draft": {
         "id": "cold_email_draft",
         "difficulty": "medium",
@@ -82,9 +69,6 @@ TASKS = {
         },
     },
 
-    # ─────────────────────────────────────────────────────────────
-    # TASK 3 — Hard: A/B Copy Test Judge
-    # ─────────────────────────────────────────────────────────────
     "ab_copy_judge": {
         "id": "ab_copy_judge",
         "difficulty": "hard",
@@ -104,7 +88,7 @@ TASKS = {
             "REASON 2: ...\n"
             "REASON 3: ..."
         ),
-        "_ground_truth": "B",  # now unambiguous -- specific + social proof vs vague generic
+        "_ground_truth": "B",
         "context": {
             "campaign_a_headline": "We Have Great Software For You",
             "campaign_a_opener": "Dear Finance Team, our product has many features...",
